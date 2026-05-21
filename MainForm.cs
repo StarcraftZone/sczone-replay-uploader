@@ -8,9 +8,19 @@
         private FileSystemWatcher? _watcher;
         private bool _watching = false;
 
+        private const string AppName = "SCZoneReplayUploader";
+        private const string RunKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
+
         public MainForm()
         {
             InitializeComponent();
+            chkAutoStart.Checked = IsAutoStartEnabled();
+            Load += (_, _) =>
+            {
+                chkAutoStart.Left = ClientSize.Width - chkAutoStart.Width - 12;
+                chkAutoStart.Top = lnkReplay.Top + (lnkReplay.Height - chkAutoStart.Height) / 2;
+            };
+            StartWatching();
         }
 
         private void BtnToggle_Click(object sender, EventArgs e)
@@ -166,6 +176,27 @@
         {
             StopWatching();
             base.OnFormClosing(e);
+        }
+
+        private void LnkReplay_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://haoest.com/replay") { UseShellExecute = true });
+        }
+
+        private bool IsAutoStartEnabled()
+        {
+            using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RunKey, false);
+            return key?.GetValue(AppName) is string val && val == Application.ExecutablePath;
+        }
+
+        private void ChkAutoStart_CheckedChanged(object sender, EventArgs e)
+        {
+            using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RunKey, true);
+            if (key == null) return;
+            if (chkAutoStart.Checked)
+                key.SetValue(AppName, Application.ExecutablePath);
+            else
+                key.DeleteValue(AppName, false);
         }
     }
 }
