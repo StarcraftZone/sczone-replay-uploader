@@ -17,6 +17,7 @@
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             lblStatus = new Label();
             btnToggle = new Button();
             btnUpload = new Button();
@@ -132,6 +133,7 @@
             Controls.Add(lstLog);
             Controls.Add(lnkReplay);
             Controls.Add(chkAutoStart);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(6);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
