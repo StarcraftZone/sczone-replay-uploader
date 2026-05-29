@@ -82,16 +82,16 @@ jobs:
           $prevTag = git tag --sort=-creatordate | Select-Object -First 1
           if ($prevTag) {
             $range = "$prevTag..$sha"
-            $changelogLine = "**Full Changelog**: $repoUrl/compare/$prevTag...$tag"
+            $changelogLine = "**代码变更**: $repoUrl/compare/$prevTag...$tag"
           } else {
             $range = $sha
-            $changelogLine = "**Full Changelog**: $repoUrl/commits/$tag"
+            $changelogLine = "**代码变更**: $repoUrl/commits/$tag"
           }
 
           $commits = git log $range --pretty=format:'* %s (%h)' --no-merges
           if (-not $commits) { $commits = '* (无提交)' }
 
-          $note = "备注：请点击下方 ↓ Assets 中的 exe 链接下载程序（无需安装可直接运行），即可实现游戏结束后自动上传录像文件。"
+          $note = "备注: 请点击下方 ↓ Assets 中的 exe 链接下载程序（无需安装可直接运行），即可实现游戏结束后自动上传录像文件。"
           $finalNotes = @('## 更新内容', $commits, '', $changelogLine, '', $note) -join "`n"
 
           $delim = "EOF_$([guid]::NewGuid().ToString('N'))"
