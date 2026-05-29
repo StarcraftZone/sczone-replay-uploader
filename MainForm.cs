@@ -4,6 +4,8 @@
     {
         private static readonly HttpClient _http = new();
         private const string UploadUrl = "https://haoest.com/api/replay/upload";
+        private const string ReleasesApi = "https://api.github.com/repos/StarcraftZone/sczone-replay-uploader/releases/latest";
+        private const string ReleasesPage = "https://github.com/StarcraftZone/sczone-replay-uploader/releases/latest";
 
         private FileSystemWatcher? _watcher;
         private bool _watching = false;
@@ -23,6 +25,7 @@
             };
             Resize += MainForm_Resize;
             StartWatching();
+            _ = CheckForUpdateAsync();
         }
 
         private void MainForm_Resize(object? sender, EventArgs e)
@@ -219,6 +222,68 @@
         private void LnkReplay_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://haoest.com/replay") { UseShellExecute = true });
+        }
+
+        private static Version GetCurrentVersion()
+        {
+            var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            return v ?? new Version(0, 0, 0, 0);
+        }
+
+        private async Task CheckForUpdateAsync()
+        {
+            try
+            {
+                using var req = new HttpRequestMessage(HttpMethod.Get, ReleasesApi);
+                req.Headers.UserAgent.ParseAdd($"sczone-replay-uploader/{GetCurrentVersion()}");
+                req.Headers.Accept.ParseAdd("application/vnd.github+json");
+                using var resp = await _http.SendAsync(req);
+                if (!resp.IsSuccessStatusCode)
+                {
+                    Log($"[更新] 检查失败：{(int)resp.StatusCode}");
+                    return;
+                }
+
+                using var doc = System.Text.Json.JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+                var root = doc.RootElement;
+                var tag = root.TryGetProperty("tag_name", out var t) ? t.GetString() : null;
+                var url = root.TryGetProperty("html_url", out var u) ? u.GetString() : ReleasesPage;
+                if (string.IsNullOrEmpty(tag)) return;
+
+                if (!Version.TryParse(tag.TrimStart('v', 'V'), out var latest))
+                {
+                    Log($"[更新] 无法解析最新版本号：{tag}");
+                    return;
+                }
+
+                var current = GetCurrentVersion();
+                if (latest <= current)
+                {
+                    Log($"[更新] 当前已是最新版本：{current}");
+                    return;
+                }
+
+                Log($"[更新] 发现新版本 {latest}（当前 {current}）");
+                Invoke(() => PromptUpdate(current, latest, url ?? ReleasesPage));
+            }
+            catch (Exception ex)
+            {
+                Log($"[更新] 检查异常：{ex.Message}");
+            }
+        }
+
+        private void PromptUpdate(Version current, Version latest, string url)
+        {
+            var result = MessageBox.Show(
+                this,
+                $"发现新版本 {latest}\n当前版本 {current}\n\n是否前往下载页面？",
+                "发现新版本",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Information);
+            if (result == DialogResult.Yes)
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
+            }
         }
 
         private bool IsAutoStartEnabled()
