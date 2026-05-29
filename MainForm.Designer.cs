@@ -26,6 +26,7 @@
             lstLog = new RichTextBox();
             lnkReplay = new LinkLabel();
             chkAutoStart = new CheckBox();
+            lnkGithub = new LinkLabel();
             trayMenu = new ContextMenuStrip(components);
             trayMenuShow = new ToolStripMenuItem();
             trayMenuExit = new ToolStripMenuItem();
@@ -112,6 +113,21 @@
             lnkReplay.Text = "录像在线分析：https://haoest.com/replay";
             lnkReplay.UseCompatibleTextRendering = true;
             lnkReplay.LinkClicked += LnkReplay_LinkClicked;
+            //
+            // lnkGithub
+            //
+            lnkGithub.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            lnkGithub.AutoSize = true;
+            lnkGithub.LinkArea = new LinkArea(0, 10);
+            lnkGithub.Location = new Point(500, 788);
+            lnkGithub.Margin = new Padding(6, 0, 6, 0);
+            lnkGithub.Name = "lnkGithub";
+            lnkGithub.Size = new Size(150, 33);
+            lnkGithub.TabIndex = 8;
+            lnkGithub.TabStop = true;
+            lnkGithub.Text = "GitHub 源码";
+            lnkGithub.UseCompatibleTextRendering = true;
+            lnkGithub.LinkClicked += LnkGithub_LinkClicked;
             // 
             // chkAutoStart
             // 
@@ -160,6 +176,7 @@
             Controls.Add(lblProgress);
             Controls.Add(lstLog);
             Controls.Add(lnkReplay);
+            Controls.Add(lnkGithub);
             Controls.Add(chkAutoStart);
             Margin = new Padding(6);
             Name = "MainForm";
@@ -178,6 +195,7 @@
         private Label lblProgress;
         private RichTextBox lstLog;
         private LinkLabel lnkReplay;
+        private LinkLabel lnkGithub;
         private CheckBox chkAutoStart;
         private NotifyIcon notifyIcon;
         private ContextMenuStrip trayMenu;

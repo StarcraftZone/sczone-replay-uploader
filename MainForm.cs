@@ -227,6 +227,11 @@
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://haoest.com/replay") { UseShellExecute = true });
         }
 
+        private void LnkGithub_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://github.com/StarcraftZone/sczone-replay-uploader") { UseShellExecute = true });
+        }
+
         private static Version GetCurrentVersion()
         {
             var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
