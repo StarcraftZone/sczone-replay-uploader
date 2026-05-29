@@ -28,8 +28,10 @@ jobs:
           $csproj = Get-Content sczone-replay-uploader.csproj -Raw
           $match = [regex]::Match($csproj, '<Version>([^<]+)</Version>')
           if (-not $match.Success) { throw 'No <Version> found in csproj' }
-          $parts = $match.Groups[1].Value.Split('.')
-          $version = "{0}.{1}.{2}" -f $parts[0], $parts[1], ${env:GITHUB_RUN_NUMBER}
+          $base = $match.Groups[1].Value
+          $parts = $base.Split('.')
+          while ($parts.Count -lt 3) { $parts += '0' }
+          $version = "{0}.{1}.{2}.{3}" -f $parts[0], $parts[1], $parts[2], ${env:GITHUB_RUN_NUMBER}
           "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           Write-Host "Version: $version"
 
