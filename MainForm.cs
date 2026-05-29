@@ -14,6 +14,7 @@
         public MainForm()
         {
             InitializeComponent();
+            LoadAppIcon();
             chkAutoStart.Checked = IsAutoStartEnabled();
             Load += (_, _) =>
             {
@@ -31,6 +32,15 @@
                 Hide();
                 notifyIcon.Visible = true;
             }
+        }
+
+        private void LoadAppIcon()
+        {
+            using var stream = typeof(MainForm).Assembly.GetManifestResourceStream("favicon-sc2.ico");
+            if (stream == null) return;
+            var icon = new Icon(stream);
+            Icon = icon;
+            notifyIcon.Icon = icon;
         }
 
         private void ShowFromTray()

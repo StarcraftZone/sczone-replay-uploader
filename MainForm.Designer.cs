@@ -18,7 +18,6 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             lblStatus = new Label();
             btnToggle = new Button();
             btnUpload = new Button();
@@ -145,7 +144,6 @@
             // notifyIcon
             //
             notifyIcon.ContextMenuStrip = trayMenu;
-            notifyIcon.Icon = (Icon)resources.GetObject("$this.Icon");
             notifyIcon.Text = "星际2录像自动上传器";
             notifyIcon.Visible = false;
             notifyIcon.DoubleClick += NotifyIcon_DoubleClick;
@@ -163,7 +161,6 @@
             Controls.Add(lstLog);
             Controls.Add(lnkReplay);
             Controls.Add(chkAutoStart);
-            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(6);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
