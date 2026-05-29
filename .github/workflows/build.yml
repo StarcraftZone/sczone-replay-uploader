@@ -54,13 +54,6 @@ jobs:
           -p:FileVersion=${{ steps.ver.outputs.version }}
           -o publish
 
-      - name: Rename exe with version
-        shell: pwsh
-        run: |
-          $src = 'publish/sczone-replay-uploader.exe'
-          $dst = "publish/sczone-replay-uploader-v${{ steps.ver.outputs.version }}-win-x64.exe"
-          Rename-Item -Path $src -NewName (Split-Path $dst -Leaf)
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
