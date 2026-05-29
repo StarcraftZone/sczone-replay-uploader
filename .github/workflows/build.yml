@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -73,12 +76,24 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $tag = "v${{ steps.ver.outputs.version }}"
-          $body = @{ tag_name = $tag } | ConvertTo-Json -Compress
-          $resp = $body | gh api -X POST "repos/${{ github.repository }}/releases/generate-notes" --input - | ConvertFrom-Json
-          $rawNotes = if ($resp.body) { $resp.body } else { '' }
-          $rawNotes = $rawNotes -replace '\*\*Full Changelog\*\*', '**更新内容**'
-          $intro = "请点击下方 Assets 中的 exe 链接下载程序（无需安装可直接运行），即可实现游戏结束后自动上传录像文件。`n`n"
-          $finalNotes = $intro + $rawNotes
+          $repoUrl = "https://github.com/${{ github.repository }}"
+          $sha = "${{ github.sha }}"
+
+          $prevTag = git tag --sort=-creatordate | Select-Object -First 1
+          if ($prevTag) {
+            $range = "$prevTag..$sha"
+            $changelogLine = "**Full Changelog**: $repoUrl/compare/$prevTag...$tag"
+          } else {
+            $range = $sha
+            $changelogLine = "**Full Changelog**: $repoUrl/commits/$tag"
+          }
+
+          $commits = git log $range --pretty=format:'* %s (%h)' --no-merges
+          if (-not $commits) { $commits = '* (无提交)' }
+
+          $note = "备注：请点击下方 ↓ Assets 中的 exe 链接下载程序（无需安装可直接运行），即可实现游戏结束后自动上传录像文件。"
+          $finalNotes = @('## 更新内容', $commits, '', $changelogLine, '', $note) -join "`n"
+
           $delim = "EOF_$([guid]::NewGuid().ToString('N'))"
           "notes<<$delim" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           $finalNotes | Out-File -FilePath $env:GITHUB_OUTPUT -Append
