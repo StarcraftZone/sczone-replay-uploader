@@ -65,6 +65,25 @@ jobs:
           path: publish/*.exe
           if-no-files-found: error
 
+      - name: Generate release notes
+        if: github.event_name == 'push'
+        id: notes
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "v${{ steps.ver.outputs.version }}"
+          $body = @{ tag_name = $tag } | ConvertTo-Json -Compress
+          $resp = $body | gh api -X POST "repos/${{ github.repository }}/releases/generate-notes" --input - | ConvertFrom-Json
+          $rawNotes = if ($resp.body) { $resp.body } else { '' }
+          $rawNotes = $rawNotes -replace '\*\*Full Changelog\*\*', '**更新内容**'
+          $intro = "请点击下方 Assets 中的 exe 链接下载程序（无需安装可直接运行），即可实现游戏结束后自动上传录像文件。`n`n"
+          $finalNotes = $intro + $rawNotes
+          $delim = "EOF_$([guid]::NewGuid().ToString('N'))"
+          "notes<<$delim" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          $finalNotes | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          $delim | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
       - name: Create Release
         if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
@@ -72,4 +91,4 @@ jobs:
           tag_name: v${{ steps.ver.outputs.version }}
           name: v${{ steps.ver.outputs.version }}
           files: publish/*.exe
-          generate_release_notes: true
+          body: ${{ steps.notes.outputs.notes }}
