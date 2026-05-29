@@ -146,7 +146,7 @@
             notifyIcon.ContextMenuStrip = trayMenu;
             notifyIcon.Text = "星际2录像自动上传器";
             notifyIcon.Visible = false;
-            notifyIcon.DoubleClick += NotifyIcon_DoubleClick;
+            notifyIcon.MouseClick += NotifyIcon_MouseClick;
             // 
             // MainForm
             // 

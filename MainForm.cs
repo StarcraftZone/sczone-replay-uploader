@@ -54,7 +54,10 @@
             notifyIcon.Visible = false;
         }
 
-        private void NotifyIcon_DoubleClick(object? sender, EventArgs e) => ShowFromTray();
+        private void NotifyIcon_MouseClick(object? sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left) ShowFromTray();
+        }
 
         private void TrayMenuShow_Click(object? sender, EventArgs e) => ShowFromTray();
 
