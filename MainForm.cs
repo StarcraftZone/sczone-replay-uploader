@@ -20,7 +20,35 @@
                 chkAutoStart.Left = ClientSize.Width - chkAutoStart.Width - 12;
                 chkAutoStart.Top = lnkReplay.Top + (lnkReplay.Height - chkAutoStart.Height) / 2;
             };
+            Resize += MainForm_Resize;
             StartWatching();
+        }
+
+        private void MainForm_Resize(object? sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                Hide();
+                notifyIcon.Visible = true;
+            }
+        }
+
+        private void ShowFromTray()
+        {
+            Show();
+            WindowState = FormWindowState.Normal;
+            Activate();
+            notifyIcon.Visible = false;
+        }
+
+        private void NotifyIcon_DoubleClick(object? sender, EventArgs e) => ShowFromTray();
+
+        private void TrayMenuShow_Click(object? sender, EventArgs e) => ShowFromTray();
+
+        private void TrayMenuExit_Click(object? sender, EventArgs e)
+        {
+            notifyIcon.Visible = false;
+            Close();
         }
 
         private void BtnToggle_Click(object sender, EventArgs e)

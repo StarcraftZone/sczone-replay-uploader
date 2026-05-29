@@ -17,6 +17,7 @@
 
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             lblStatus = new Label();
             btnToggle = new Button();
@@ -26,6 +27,10 @@
             lstLog = new RichTextBox();
             lnkReplay = new LinkLabel();
             chkAutoStart = new CheckBox();
+            trayMenu = new ContextMenuStrip(components);
+            trayMenuShow = new ToolStripMenuItem();
+            trayMenuExit = new ToolStripMenuItem();
+            notifyIcon = new NotifyIcon(components);
             SuspendLayout();
             // 
             // lblStatus
@@ -119,6 +124,31 @@
             chkAutoStart.TabIndex = 7;
             chkAutoStart.Text = "开机自动启动";
             chkAutoStart.CheckedChanged += ChkAutoStart_CheckedChanged;
+            //
+            // trayMenu
+            //
+            trayMenu.Items.AddRange(new ToolStripItem[] { trayMenuShow, trayMenuExit });
+            trayMenu.Name = "trayMenu";
+            //
+            // trayMenuShow
+            //
+            trayMenuShow.Name = "trayMenuShow";
+            trayMenuShow.Text = "显示窗口";
+            trayMenuShow.Click += TrayMenuShow_Click;
+            //
+            // trayMenuExit
+            //
+            trayMenuExit.Name = "trayMenuExit";
+            trayMenuExit.Text = "退出程序";
+            trayMenuExit.Click += TrayMenuExit_Click;
+            //
+            // notifyIcon
+            //
+            notifyIcon.ContextMenuStrip = trayMenu;
+            notifyIcon.Icon = (Icon)resources.GetObject("$this.Icon");
+            notifyIcon.Text = "星际2录像自动上传器";
+            notifyIcon.Visible = false;
+            notifyIcon.DoubleClick += NotifyIcon_DoubleClick;
             // 
             // MainForm
             // 
@@ -152,5 +182,9 @@
         private RichTextBox lstLog;
         private LinkLabel lnkReplay;
         private CheckBox chkAutoStart;
+        private NotifyIcon notifyIcon;
+        private ContextMenuStrip trayMenu;
+        private ToolStripMenuItem trayMenuShow;
+        private ToolStripMenuItem trayMenuExit;
     }
 }
